@@ -42,6 +42,7 @@ function IssueRow(props) {
 function IssueTable(props) {
   var issueRows = props.issues.map(function (issue) {
     return /*#__PURE__*/React.createElement(IssueRow, {
+      key: issue.id,
       issue: issue
     });
   });
@@ -109,7 +110,7 @@ function _graphQLFetch() {
           variables = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : {};
           _context3.p = 1;
           _context3.n = 2;
-          return fetch('/graphql', {
+          return fetch(window.ENV.UI_API_ENDPOINT, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
