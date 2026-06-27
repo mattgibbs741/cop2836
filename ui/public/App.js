@@ -17,11 +17,18 @@ function _isNativeReflectConstruct() { try { var t = !Boolean.prototype.valueOf.
 function _getPrototypeOf(t) { return _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function (t) { return t.__proto__ || Object.getPrototypeOf(t); }, _getPrototypeOf(t); }
 function _inherits(t, e) { if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function"); t.prototype = Object.create(e && e.prototype, { constructor: { value: t, writable: !0, configurable: !0 } }), Object.defineProperty(t, "prototype", { writable: !1 }), e && _setPrototypeOf(t, e); }
 function _setPrototypeOf(t, e) { return _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function (t, e) { return t.__proto__ = e, t; }, _setPrototypeOf(t, e); }
+/* eslint "react/react-in-jsx-scope": "off" */
+/* eslint "react/jsx-no-undef": "off" */
+/* eslint "no-alert": "off" */
+/* globals React ReactDOM */
+
 var dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
 function jsonDateReviver(key, value) {
   if (dateRegex.test(value)) return new Date(value);
   return value;
 }
+
+// eslint-disable-next-line react/prefer-stateless-function
 var IssueFilter = /*#__PURE__*/function (_React$Component) {
   function IssueFilter() {
     _classCallCheck(this, IssueFilter);
@@ -40,7 +47,8 @@ function IssueRow(props) {
   return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, issue.id), /*#__PURE__*/React.createElement("td", null, issue.status), /*#__PURE__*/React.createElement("td", null, issue.owner), /*#__PURE__*/React.createElement("td", null, issue.created.toDateString()), /*#__PURE__*/React.createElement("td", null, issue.effort), /*#__PURE__*/React.createElement("td", null, issue.due ? issue.due.toDateString() : ' '), /*#__PURE__*/React.createElement("td", null, issue.title));
 }
 function IssueTable(props) {
-  var issueRows = props.issues.map(function (issue) {
+  var issues = props.issues;
+  var issueRows = issues.map(function (issue) {
     return /*#__PURE__*/React.createElement(IssueRow, {
       key: issue.id,
       issue: issue
@@ -69,9 +77,10 @@ var IssueAdd = /*#__PURE__*/function (_React$Component2) {
         title: form.title.value,
         due: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10)
       };
-      this.props.createIssue(issue);
-      form.owner.value = "";
-      form.title.value = "";
+      var createIssue = this.props.createIssue;
+      createIssue(issue);
+      form.owner.value = '';
+      form.title.value = '';
     }
   }, {
     key: "render",
@@ -87,7 +96,9 @@ var IssueAdd = /*#__PURE__*/function (_React$Component2) {
         type: "text",
         name: "title",
         placeholder: "Title"
-      }), /*#__PURE__*/React.createElement("button", null, "Add"));
+      }), /*#__PURE__*/React.createElement("button", {
+        type: "submit"
+      }, "Add"));
     }
   }]);
 }(React.Component);
@@ -129,7 +140,7 @@ function _graphQLFetch() {
           result = JSON.parse(body, jsonDateReviver);
           if (result.errors) {
             error = result.errors[0];
-            if (error.extensions.code == 'BAD_USER_INPUT') {
+            if (error.extensions.code === 'BAD_USER_INPUT') {
               details = error.extensions.exception.errors.join('\n ');
               alert("".concat(error.message, ":\n ").concat(details));
             } else {
@@ -141,8 +152,7 @@ function _graphQLFetch() {
           _context3.p = 4;
           _t = _context3.v;
           alert("Error in sending data to server: ".concat(_t.message));
-        case 5:
-          return _context3.a(2);
+          return _context3.a(2, null);
       }
     }, _callee3, null, [[1, 4]]);
   }));
@@ -161,34 +171,6 @@ var IssueList = /*#__PURE__*/function (_React$Component3) {
   }
   _inherits(IssueList, _React$Component3);
   return _createClass(IssueList, [{
-    key: "createIssue",
-    value: function () {
-      var _createIssue = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(issue) {
-        var query, data;
-        return _regenerator().w(function (_context) {
-          while (1) switch (_context.n) {
-            case 0:
-              query = "mutation issueAdd($issue: IssueInputs!) {\n      issueAdd(issue: $issue) {\n        id\n      }\n    }";
-              _context.n = 1;
-              return graphQLFetch(query, {
-                issue: issue
-              });
-            case 1:
-              data = _context.v;
-              if (data) {
-                this.loadData();
-              }
-            case 2:
-              return _context.a(2);
-          }
-        }, _callee, this);
-      }));
-      function createIssue(_x2) {
-        return _createIssue.apply(this, arguments);
-      }
-      return createIssue;
-    }()
-  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
       this.loadData();
@@ -196,25 +178,25 @@ var IssueList = /*#__PURE__*/function (_React$Component3) {
   }, {
     key: "loadData",
     value: function () {
-      var _loadData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+      var _loadData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
         var query, data;
-        return _regenerator().w(function (_context2) {
-          while (1) switch (_context2.n) {
+        return _regenerator().w(function (_context) {
+          while (1) switch (_context.n) {
             case 0:
               query = "query {\n      issueList {\n        id title status owner created effort due\n      }\n    }";
-              _context2.n = 1;
+              _context.n = 1;
               return graphQLFetch(query);
             case 1:
-              data = _context2.v;
+              data = _context.v;
               if (data) {
                 this.setState({
                   issues: data.issueList
                 });
               }
             case 2:
-              return _context2.a(2);
+              return _context.a(2);
           }
-        }, _callee2, this);
+        }, _callee, this);
       }));
       function loadData() {
         return _loadData.apply(this, arguments);
@@ -222,10 +204,39 @@ var IssueList = /*#__PURE__*/function (_React$Component3) {
       return loadData;
     }()
   }, {
+    key: "createIssue",
+    value: function () {
+      var _createIssue = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(issue) {
+        var query, data;
+        return _regenerator().w(function (_context2) {
+          while (1) switch (_context2.n) {
+            case 0:
+              query = "mutation issueAdd($issue: IssueInputs!) {\n      issueAdd(issue: $issue) {\n        id\n      }\n    }";
+              _context2.n = 1;
+              return graphQLFetch(query, {
+                issue: issue
+              });
+            case 1:
+              data = _context2.v;
+              if (data) {
+                this.loadData();
+              }
+            case 2:
+              return _context2.a(2);
+          }
+        }, _callee2, this);
+      }));
+      function createIssue(_x2) {
+        return _createIssue.apply(this, arguments);
+      }
+      return createIssue;
+    }()
+  }, {
     key: "render",
     value: function render() {
+      var issues = this.state.issues;
       return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h1", null, "Issue Tracker"), /*#__PURE__*/React.createElement(IssueFilter, null), /*#__PURE__*/React.createElement("hr", null), /*#__PURE__*/React.createElement(IssueTable, {
-        issues: this.state.issues
+        issues: issues
       }), /*#__PURE__*/React.createElement("hr", null), /*#__PURE__*/React.createElement(IssueAdd, {
         createIssue: this.createIssue
       }));

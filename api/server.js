@@ -78,7 +78,6 @@ async function issueAdd(_, { issue }) {
   validateIssue(issue);
 
   const newIssue = Object.assign({}, issue);
-
   newIssue.created = new Date();
   newIssue.id = await getNextSequence('issues');
 
@@ -87,7 +86,6 @@ async function issueAdd(_, { issue }) {
   }
 
   const result = await db.collection('issues').insertOne(newIssue);
-
   const savedIssue = await db.collection('issues').findOne({
     _id: result.insertedId,
   });
